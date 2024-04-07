@@ -7,7 +7,7 @@
     },
     "scripts": {
         "start": "pyright && pytest && yarn style",
-        "test": "nodemon -w tests -w src -e .py -x pytest tests",
+        "test": "nodemon -w tests -w src -e .py -x cross-env LOGURU_LEVEL=TRACE rye run pytest",
         "pyright": "nodemon -w src -w .venv -e .py -x pyright src tests",
         "pytest": "nodemon -w tests -w src -e .py -x pytest tests src",
         "style": "nodemon -w src -w tests -x \"black tests src && python -m flake8\"",

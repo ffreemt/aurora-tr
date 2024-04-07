@@ -3,4 +3,4 @@
 
 # npm test
 black .
-ruff . --fix
+ruff check . --fix
