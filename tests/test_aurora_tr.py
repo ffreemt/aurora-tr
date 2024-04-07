@@ -29,7 +29,7 @@ def test_aurora_tr_url():
 def test_aurora_tr_dw_text():
     """Test aurora_tr digital twin text."""
     text = "A digital twin is a virtual model or representation of an object, component, or system that can be updated through real-time data via sensors, either within the object itself or incorporated into the manufacturing process."
-    
+
     # Test only locally, too lazy to set github secrets
     if platform.node().startswith("go"):
         _ = aurora_tr(text)
