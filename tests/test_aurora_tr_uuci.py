@@ -30,6 +30,8 @@ def test_aurora_tr_uuci_url():
 def test_aurora_tr_uuci_dw_text():
     """Test aurora_tr digital twin text."""
     text = "A digital twin is a virtual model or representation of an object, component, or system that can be updated through real-time data via sensors, either within the object itself or incorporated into the manufacturing process."
+
+    # only test locally, too lazy to set github secrets
     if platform.node().startswith("go"):
         api_key = dotenv.dotenv_values().get("OPENAI_API_KEY_UUCI")
         _ = aurora_tr(text, selector="uuci", api_key=api_key)
