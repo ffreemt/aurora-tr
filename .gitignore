@@ -9,4 +9,7 @@ wheels/
 # venv
 .venv
 .ruff_cache
-.env*
+.env
+dotenv
+.yarn/
+.pnp.cjs

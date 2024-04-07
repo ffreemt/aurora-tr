@@ -1,6 +1,6 @@
 [project]
 name = "aurora-tr"
-version = "0.1.0"
+version = "0.1.1a0"
 description = "Translate via aurora and variants, openai, azure openai, etc."
 authors = [
     { name = "ffreemt" }
@@ -11,6 +11,7 @@ dependencies = [
     "openai>=1.16.2",
     "loguru>=0.7.2",
     "rich>=13.7.1",
+    "joblib>=1.3.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
