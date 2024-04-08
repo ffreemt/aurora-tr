@@ -5,6 +5,8 @@ description = "Translate via aurora and variants, openai, azure openai, etc."
 authors = [
     { name = "ffreemt" }
 ]
+license = "MIT"
+repository = "https://github.com/ffreemt/aurora-tr"
 
 dependencies = [
     "python-dotenv>=1.0.1",

@@ -78,17 +78,20 @@ def aurora_tr(
     text: string to transalte
     from_lang: source language
     to_lang: target language
-    selector: prodiver selector
+    selector: provider selector
     base_url:
     api_key: token
     model: model name, anything for aurora
-    temperature (str): 0.2-0.4 for translation, might just left out
+    temperature (float): 0.2-0.4 for translation, might just be left out
 
     Returns
     -------
     dict/json: {"translation": "...", notes: "..."}
     """
-    selector = selector.upper()  #  = "AURORA"
+    try:
+        selector = selector.strip().upper()  #  = "AURORA"
+    except Exception:
+        selector = "aurora"
 
     try:
         from_lang = from_lang.strip().lower()

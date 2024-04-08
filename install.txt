@@ -1,0 +1,3 @@
+rye pin 3.12.0  # or whatever version
+rye sync  # or uv pip install -r requirements.lock
+rye run pytest
