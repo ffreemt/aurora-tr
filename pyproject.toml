@@ -1,6 +1,6 @@
 [project]
 name = "aurora-tr"
-version = "0.1.1"
+version = "0.1.2a0"
 description = "Translate via aurora and variants, openai, azure openai, etc."
 authors = [
     { name = "ffreemt" }

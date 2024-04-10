@@ -1,6 +1,7 @@
 """Make sure __version__ matches version in pyproject.toml."""
 import re
 from pathlib import Path
+
 from aurora_tr import __version__
 from loguru import logger
 

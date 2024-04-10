@@ -26,22 +26,26 @@ temperature: Union[float, None] = None
 
 """
 # pylint: disable=line-too-long,invalid-name,broad-except
-from typing import Union
 import json
 import os
+from typing import Union
+
 import dotenv
 import stamina
 import validators
 from loguru import logger
-
-from openai import BadRequestError, RateLimitError, OpenAI, APITimeoutError
+from openai import APITimeoutError, BadRequestError, OpenAI, RateLimitError
 
 prompt_tr = """I want you to act as a translator from any language {to_lang}. You will translate into {to_lang} text.
 Your output should be in json format with optional 'translation' (string, only include the translation and nothing else, do not write explanations here) and 'notes' (string) fields.
 If an input cannot be translated, return it unmodified in the 'translation' field."""
 
-prompt_tr = """You are a professional translator from any language to {to_lang}. You will translate into {to_lang} text.\nYour output will always be in json format with optional 'translation' (string, only include the translation and nothing else, do not write explanations here) and 'notes' (string) fields.\nIf an input is already {to_lang} or cannot be translated, return it unmodified in the 'translation' field."""
-prompt_tr2 = """You are a professional translator from {from_lang} to  {to_lang}. You will translate into {to_lang} text.\nYour output will always be in json format with optional 'translation' (string, only include the translation and nothing else, do not write explanations here) and 'notes' (string) fields.\nIf an input is already {to_lang} or cannot be translated, return it unmodified in the 'translation' field."""
+prompt_tr = """You are a professional translator from any language to {to_lang}. You will translate into {to_lang} text.
+Your output will always be in json format with optional 'translation' (string, only include the translation and nothing else, do not write explanations here) and 'notes' (string) fields.
+If an input is already {to_lang} or cannot be translated, return it unmodified in the 'translation' field."""
+prompt_tr2 = """You are a professional translator from {from_lang} to  {to_lang}. You will translate into {to_lang} text.
+Your output will always be in json format with optional 'translation' (string, only include the translation and nothing else, do not write explanations here) and 'notes' (string) fields.
+If an input is already {to_lang} or cannot be translated, return it unmodified in the 'translation' field."""
 
 
 # default: attempts 10,
@@ -73,20 +77,21 @@ def aurora_tr(
     """
     Translate viaa auroa and uu.ci.
 
-    Args
+    Args:
     ----
     text: string to transalte
     from_lang: source language
     to_lang: target language
     selector: provider selector
-    base_url:
+    base_url: service base url
     api_key: token
     model: model name, anything for aurora
     temperature (float): 0.2-0.4 for translation, might just be left out
 
-    Returns
+    Returns:
     -------
     dict/json: {"translation": "...", notes: "..."}
+
     """
     try:
         selector = selector.strip().upper()  #  = "AURORA"
@@ -128,18 +133,26 @@ def aurora_tr(
     # load from .env
     dotenv.load_dotenv(".env-aurora")
 
+    # set OPENAI_DEBUG="debug" if LOGURU_LEVEL set to "TRACE"
+
+    OPENAI_LOG = "info"
+    if os.getenv("LOGURU_LEVEL") in ["TRACE"]:
+        OPENAI_LOG = "debug"
+
     os.environ.update(
         {
             "OPENAI_BASE_URL": os.getenv("OPENAI_BASE_URL" + suffix, ""),
             "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY" + suffix, ""),
             "OPENAI_MODEL": os.getenv("OPENAI_MODEL" + suffix, ""),
-            "OPENAI_LOG": "debug",
+            "OPENAI_LOG": OPENAI_LOG,
         }
     )
 
-    logger.trace(f"trace: {os.getenv('OPENAI_BASE_URL')[:12]=}")
-    logger.debug(f"debug: {os.getenv('OPENAI_BASE_URL')[:12]=}")
+    # base_url takes precedence
     base_url = base_url or os.getenv("OPENAI_BASE_URL")
+
+    # logger.debug(f"debug: {os.getenv('OPENAI_BASE_URL')[:12]=}")
+    logger.trace(f"trace: {base_url=}")
 
     assert (
         base_url
@@ -148,25 +161,23 @@ def aurora_tr(
     # for aurora: any string will do for aurora, gpt-3.5-turbo-0125
     # model = "gptx"
 
-    if selector in ["AURORA"]:  # bypass api_key
-        client = OpenAI(
-            base_url=base_url,
-            # api_key= api_key,
-            max_retries=3,  # def 2
-        )
-    else:
+    if selector not in ["AURORA"] or api_key:
+        # api_key takes precedence
         api_key = api_key or os.getenv("OPENAI_API_KEY")
         assert (
-            base_url
-        ), f"either base_url or env var OPENAI_BASE_URL{suffix} must be given."
-
-        model = model or os.getenv("OPENAI_MODEL")
-        assert base_url, f"either model or env var OPENAI_MODEL{suffix} must be given."
+            api_key
+        ), f"either api_key or env var OPENAI_BASE_URL{suffix} must be given."
 
         client = OpenAI(
             base_url=base_url,
             api_key=api_key,
             max_retries=3,  # default 2
+        )
+    else:  # bypass api_key
+        client = OpenAI(
+            base_url=base_url,
+            # api_key= api_key,
+            max_retries=3,  # def 2
         )
 
     if not text.strip():
@@ -183,6 +194,9 @@ def aurora_tr(
 
     content = None
     res = None  # to please pyright
+    model = model or os.getenv("OPENAI_MODEL")
+    assert base_url, f"either model or env var OPENAI_MODEL{suffix} must be given."
+
     try:
         # response = client.chat.completions.create(
         if temperature:
@@ -212,6 +226,8 @@ def aurora_tr(
         logger.trace(response.headers)
 
         completion = response.parse()
+        logger.trace(completion)
+
         content = completion.choices[0].message.content
 
     except BadRequestError as exc:
@@ -222,7 +238,7 @@ def aurora_tr(
         logger.warning(exc)
     except Exception as exc:
         res = {"translation": text, "notes": f" {exc} "}
-        logger.warning(exc)
+        logger.debug(exc)
         raise
 
     if content is not None:

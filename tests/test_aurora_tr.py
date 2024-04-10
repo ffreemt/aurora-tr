@@ -4,6 +4,7 @@ Test aurora_tr.
 run `rye run pytest`
 """
 import platform
+
 import pytest
 import stamina
 from aurora_tr import aurora_tr
@@ -26,7 +27,7 @@ def test_aurora_tr_url():
     assert _.get("translation").startswith("http")
 
 
-def test_aurora_tr_dw_text():
+def test_aurora_tr_dt_text():
     """Test aurora_tr digital twin text."""
     text = "A digital twin is a virtual model or representation of an object, component, or system that can be updated through real-time data via sensors, either within the object itself or incorporated into the manufacturing process."
 

@@ -3,17 +3,38 @@
 
 Translate via aurora and variants, openai, azure openai, etc.
 
+# gpt-translation: Free Lunch
+
+(as long as the `freegpt.art` service is up)
+
+```bash
+pip install aurora-tr --pre
+```
+python code
+```python
+from aurora_tr import aurora_tr
+
+res = aurora_tr(
+  "test me",
+  base_url = "https://api.freegpt.art/v1",
+  api_key = "sk-ZRGxqeGOAugc32bKA1529c37D92443E2A27a54De3eE87fCc",
+  mode="gpt-3.5-turbo",
+)
+print(res)
+# output: {'translation': '测试我', 'notes': ''}
+```
+
 # Quick Setup
 From command line
 ```bash
-pip install aurora-tr
+pip install aurora-tr --pre
 docker run -d --name aurora -p 8080:8080 ghcr.io/aurora-develop/aurora:latest
 ```
 python code
 ```python
 from aurora_tr import aurora_tr
 
-res = aurora_tr("test me", url="http:/127.0.0.1:8080/v1")
+res = aurora_tr("test me", base_url="http:/127.0.0.1:8080/v1")
 print(res)
 # output:  {'translation': '测试我', 'notes': ''}
 ```
@@ -22,7 +43,7 @@ print(res)
 
 ## Install
 ```
-pip install aurora-tr
+pip install aurora-tr --pre
 ```
 
 
